@@ -1,0 +1,25 @@
+package com.scb.channels.research.healthCheck;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Host;
+import com.scb.channels.research.model.healthcheck.CassandraConnectionMetaData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import java.util.Set;
+
+@Component
+public class CassandraHealthCheck {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CassandraHealthCheck.class);
+
+    public Set<Host> getAvailableHosts(CassandraConnectionMetaData cassandraConnectionMetaData) {
+
+        final Cluster.Builder clusterBuilder = Cluster.builder()
+                .addContactPoint(cassandraConnectionMetaData.getHost())
+                .withPort(cassandraConnectionMetaData.getPort())
+                .withCredentials(cassandraConnectionMetaData.getUserName(), cassandraConnectionMetaData.getPassword());
+        return clusterBuilder.build().getMetadata().getAllHosts();
+    }
+}
